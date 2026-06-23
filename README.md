@@ -1,9 +1,6 @@
 # Maji Ndogo Data Pipeline
 
-A modular ETL pipeline that ingests, cleans, and statistically validates
-agricultural and weather data for the Maji Ndogo farm survey dataset.
-Built with an emphasis on clean, testable, config-driven design rather
-than notebook-only analysis.
+This project implements a modular ETL (Extract, Transform, Load) pipeline for processing agricultural and weather datasets from the Maji Ndogo Farm Survey. The fictional nation of Maji Ndogo serves as a realistic representation of agricultural systems across Africa, highlighting the transformative role of data in improving productivity and sustainability. The pipeline incorporates automated data cleaning, statistical validation, and quality assurance mechanisms, with a strong focus on modular architecture, reproducibility, testing, and configuration-driven development practices.
 
 ## What it does
 
