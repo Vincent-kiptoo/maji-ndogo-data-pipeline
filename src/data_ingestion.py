@@ -141,4 +141,3 @@ def read_from_web_CSV(URL):
         # Network errors, invalid URLs, etc.
         logger.error(f"Failed to read CSV from {URL}. Error: {e}")
         raise Exception(f"Could not read CSV from {URL}. Error: {e}") from e
-
