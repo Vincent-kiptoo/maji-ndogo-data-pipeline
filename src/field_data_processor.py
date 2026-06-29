@@ -1,5 +1,5 @@
 import pandas as pd
-from data_ingestion import create_db_engine, query_data, read_from_web_CSV
+from src.data_ingestion import create_db_engine, query_data, read_from_web_CSV
 import logging
 
 class FieldDataProcessor:

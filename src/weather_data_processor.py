@@ -1,7 +1,7 @@
 import re
 import pandas as pd
 import logging
-from data_ingestion import read_from_web_CSV
+from src.data_ingestion import read_from_web_CSV
 
 class WeatherDataProcessor:
 
