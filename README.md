@@ -81,5 +81,5 @@ pytest tests/validate_data.py -v
 
 ## Status
 
-Work in progress — built as a portfolio project demonstrating data
-pipeline design, OOP in Python, and Git/GitHub workflows.
+Work in progress. Built as a portfolio project demonstrating data
+pipeline design, OOP in Python, testing, eploratory data analysis, statistical analysis and Git/GitHub workflows.
