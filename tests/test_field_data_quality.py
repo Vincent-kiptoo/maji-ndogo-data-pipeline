@@ -55,15 +55,8 @@ class TestFieldDataQuality:
 
 
     @pytest.mark.parametrize("column, expected", [
-        (
-            "Soil_type",
-            {"sandy", "volcanic", "loamy", "silt", "peaty", "rocky"} 
-        ),
-        (
-            "Location",
-            {"rural_akatsi", "rural_sokoto", "rural_kilimani", "rural_hawassa", "rural_amanzi"}
-        ),
-    ])
+        ("Soil_type",{"sandy", "volcanic", "loamy", "silt", "peaty", "rocky"} ),
+        ("Location", {"rural_akatsi", "rural_sokoto", "rural_kilimani", "rural_hawassa", "rural_amanzi"}),])
 
     def test_categorical_values(self, processed_field_data, column, expected):
         actual = set(
