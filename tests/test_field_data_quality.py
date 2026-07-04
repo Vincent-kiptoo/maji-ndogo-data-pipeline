@@ -15,7 +15,7 @@ class TestFieldDataQuality:
     def test_no_missing_values(self, processed_field_data):
         assert processed_field_data.isnull().sum().sum() == 0
 
-    def test_unique_field_id(self, processed_field_data):  # FIXED: added 'self' parameter
+    def test_unique_field_id(self, processed_field_data): 
         assert processed_field_data['Field_ID'].is_unique
 
 
