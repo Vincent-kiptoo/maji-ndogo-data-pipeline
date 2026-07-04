@@ -14,6 +14,7 @@ values_to_rename = {
         'teaa': 'tea'
     }
 
+
 weather_mapping_csv = "https://raw.githubusercontent.com/Explore-AI/Public-Data/master/Maji_Ndogo/Weather_data_field_mapping.csv"
 
 weather_csv_path = "https://raw.githubusercontent.com/Explore-AI/Public-Data/master/Maji_Ndogo/Weather_station_data.csv"

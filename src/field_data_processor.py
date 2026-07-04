@@ -38,7 +38,7 @@ class FieldDataProcessor:
     def ingest_sql_data(self):
         self.engine = create_db_engine(self.db_path)
         self.df = query_data(self.engine, self.sql_query)
-        self.logger.info("Sucessfully loaded data.")
+        self.logger.info("SQL data is sucessfully loaded into DataFrame.")
         return self.df
 
     def rename_columns(self):
@@ -50,7 +50,10 @@ class FieldDataProcessor:
 
     def apply_corrections(self, column_name='Crop_type', abs_column='Elevation'):
         self.df[abs_column] = self.df[abs_column].abs()
+        self.logger.info("Converted negative elevation values to absolute as per project specification")
         self.df[column_name] = self.df[column_name].apply(lambda crop: self.values_to_rename.get(crop, crop))
+        self.df[column_name] = self.df[column_name].str.strip()
+        self.logger.info("Mispelled names and extra whitespaces were found and got fixed")
 
     def weather_station_mapping(self):
         return read_from_web_CSV(self.weather_map_data)

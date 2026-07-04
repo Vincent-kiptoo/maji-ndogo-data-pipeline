@@ -7,3 +7,4 @@ scipy>=1.16.0
 sqlalchemy>=2.0.41
 jupyterlab>=4.4.0
 ipykernel>=6.30.0
+pytest>=9.1.1
