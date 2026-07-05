@@ -4,7 +4,7 @@ from src.field_data_processor import FieldDataProcessor
 from src.config import config_params
 
 @pytest.fixture(scope="module")
-def processed_field_data():
+def processed_field_data(): 
     processor = FieldDataProcessor(config_params)
     processor.process()
     return processor.df
@@ -15,7 +15,7 @@ class TestFieldDataQuality:
     def test_no_missing_values(self, processed_field_data):
         assert processed_field_data.isnull().sum().sum() == 0
 
-    def test_unique_field_id(self, processed_field_data):  # FIXED: added 'self' parameter
+    def test_unique_field_id(self, processed_field_data): 
         assert processed_field_data['Field_ID'].is_unique
 
 
@@ -55,15 +55,8 @@ class TestFieldDataQuality:
 
 
     @pytest.mark.parametrize("column, expected", [
-        (
-            "Soil_type",
-            {"sandy", "volcanic", "loamy", "silt", "peaty", "rocky"} 
-        ),
-        (
-            "Location",
-            {"rural_akatsi", "rural_sokoto", "rural_kilimani", "rural_hawassa", "rural_amanzi"}
-        ),
-    ])
+        ("Soil_type",{"sandy", "volcanic", "loamy", "silt", "peaty", "rocky"} ),
+        ("Location", {"rural_akatsi", "rural_sokoto", "rural_kilimani", "rural_hawassa", "rural_amanzi"}),])
 
     def test_categorical_values(self, processed_field_data, column, expected):
         actual = set(
