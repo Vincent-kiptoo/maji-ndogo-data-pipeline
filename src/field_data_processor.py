@@ -3,8 +3,6 @@ import logging
 from src.data_ingestion import create_db_engine, query_data, read_from_web_CSV
 from src.logging_config import get_logger
 
-
-
 class FieldDataProcessor:
 
     def __init__(self, config_params):
@@ -21,7 +19,7 @@ class FieldDataProcessor:
         self.engine = create_db_engine(self.db_path)
         self.df = query_data(self.engine, self.sql_query)
         self.logger.info("SQL data is sucessfully loaded into DataFrame.")
-        return self.df
+        return self.df 
 
     def rename_columns(self):
         column1, column2 = list(self.columns_to_rename.keys())[0], list(self.columns_to_rename.keys())[1]
