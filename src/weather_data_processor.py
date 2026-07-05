@@ -2,10 +2,11 @@ import re
 import pandas as pd
 import logging
 from src.data_ingestion import read_from_web_CSV
+from src.logging_config import get_logger
 
 class WeatherDataProcessor:
 
-    def __init__(self, config_params, logging_level = "INFO"):
+    def __init__(self, config_params):
         """
         Initialize the WeatherDataProcessor with configuration parameters.
 
@@ -23,7 +24,7 @@ class WeatherDataProcessor:
         self.weather_df = None
         self.mean_df = None
 
-        self.initialize_logging(logging_level)
+        self.logger = get_logger(__name__)
 
     def initialize_logging(self, logging_level):
         logger_name = __name__ + ".WeatherDataProcessor"
