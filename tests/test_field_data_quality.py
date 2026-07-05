@@ -4,7 +4,7 @@ from src.field_data_processor import FieldDataProcessor
 from src.config import config_params
 
 @pytest.fixture(scope="module")
-def processed_field_data():
+def processed_field_data(): 
     processor = FieldDataProcessor(config_params)
     processor.process()
     return processor.df
