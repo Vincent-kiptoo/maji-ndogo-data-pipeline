@@ -6,7 +6,7 @@ from web sources. Provides utilities for loading agricultural data from
 multiple sources into the pipeline.
 """
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, Engine
 import logging
 import pandas as pd 
 from src.logging_config import get_logger
@@ -92,7 +92,7 @@ def query_data(engine, sql_query, allow_empty=False) -> pd.DataFrame:
 
 def read_from_web_CSV(URL) -> pd.DataFrame:
     """
-    Read CSV file from a web URL into a DataFrame.
+    Fetches external weather and survey datasets used in the Maji Ndogo pipeline.
     
     Parameters
     ----------

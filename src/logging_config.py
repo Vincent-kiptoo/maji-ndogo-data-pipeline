@@ -1,8 +1,18 @@
+"""
+Logging configuration module for the data pipeline.
+
+This module provides a reusable logger factory that configures logging
+for both console and file outputs. It ensures consistent logging format
+across the entire pipeline and prevents duplicate log handlers when
+the logger is initialized multiple times.
+
+The logger supports configurable log levels and automatically creates
+log directories if they do not exist.
+"""
+
 import os
 import logging
-
-
-def get_logger(name: str, level: str = "INFO", log_file: str = "logs/pipeline.log"):
+def get_logger(name: str, level: str = "INFO", log_file: str = "logs/pipeline.log") -> logging:
     """
     Returns a configured logger that writes to both the console and a file.
     Safe to call multiple times without duplicating handlers.
