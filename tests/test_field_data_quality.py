@@ -1,4 +1,21 @@
+"""
+This module contains comprehensive quality assurance tests for the FieldDataProcessor.
+It validates that processed agricultural field data meets data integrity, and completeness before use in downstream analysis.
+
+Test Coverage:
+- Data completeness (no missing values)
+- Field uniqueness (unique Field_IDs)
+- Geographic/physical bounds validation
+- Temperature logic consistency
+- Categorical value validation (crops, soil types, locations)
+- Overall data health metrics
+"""
+
 import pytest
+import pandas as pd
+...
+
+import pytest 
 import pandas as pd
 from src.field_data_processor import FieldDataProcessor
 from src.config import config_params
