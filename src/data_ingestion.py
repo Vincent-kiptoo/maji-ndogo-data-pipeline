@@ -1,3 +1,11 @@
+"""
+Data ingestion module for the Maji Ndogo pipeline.
+
+Handles database connections, SQL query execution, and CSV file reading
+from web sources. Provides utilities for loading agricultural data from
+multiple sources into the pipeline.
+"""
+
 from sqlalchemy import create_engine, text
 import logging
 import pandas as pd 
@@ -5,7 +13,7 @@ from src.logging_config import get_logger
 
 logger = get_logger(__name__)
 
-def create_db_engine(db_path, echo=False):
+def create_db_engine(db_path, echo=False) -> Engine:
     """
     Create a SQLAlchemy database engine.
 
@@ -42,7 +50,7 @@ def create_db_engine(db_path, echo=False):
         logger.error(f"Database connection failed: {e}")
         raise ConnectionError(f"Failed to connect to database: {e}") from e
     
-def query_data(engine, sql_query, allow_empty=False):
+def query_data(engine, sql_query, allow_empty=False) -> pd.DataFrame:
     """
     Execute SQL query and return results as DataFrame.
     
@@ -54,6 +62,7 @@ def query_data(engine, sql_query, allow_empty=False):
         SQL query string
     allow_empty : bool, default=False
         If True, return empty DataFrame instead of raising error
+        when no resuults are found
     
     Returns
     -------
@@ -81,7 +90,7 @@ def query_data(engine, sql_query, allow_empty=False):
     return df
 
 
-def read_from_web_CSV(URL):
+def read_from_web_CSV(URL) -> pd.DataFrame:
     """
     Read CSV file from a web URL into a DataFrame.
     
@@ -113,11 +122,8 @@ def read_from_web_CSV(URL):
         raise ValueError(error_msg)
     
     try:
-        # Attempt to read CSV from URL
         logger.info(f"Attempting to read CSV from: {URL}")
         df = pd.read_csv(URL)
-        
-        # Check if data was loaded
         if df.empty:
             error_msg = f"CSV file is empty: {URL}"
             logger.warning(error_msg)
@@ -127,16 +133,13 @@ def read_from_web_CSV(URL):
         return df
         
     except pd.errors.EmptyDataError as e:
-        # Empty file
         logger.error(f"CSV file is empty: {URL}")
         raise
         
     except pd.errors.ParserError as e:
-        # Malformed CSV
         logger.error(f"Failed to parse CSV from {URL}. Error: {e}")
         raise
         
     except Exception as e:
-        # Network errors, invalid URLs, etc.
         logger.error(f"Failed to read CSV from {URL}. Error: {e}")
         raise Exception(f"Could not read CSV from {URL}. You can check your internet connection. Error: {e}") from e
