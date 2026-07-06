@@ -1,10 +1,9 @@
 from sqlalchemy import create_engine, text
 import logging
 import pandas as pd 
+from src.logging_config import get_logger
 
-logger = logging.getLogger("data_ingestion")
-logging.basicConfig(level = logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-
+logger = get_logger(__name__)
 
 def create_db_engine(db_path, echo=False):
     """
