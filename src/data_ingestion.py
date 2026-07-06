@@ -90,7 +90,7 @@ def read_from_web_CSV(URL):
     URL : str
         Full web URL pointing to a CSV file
     
-    Returns3
+    Returns
     -------
     pandas.DataFrame
         DataFrame containing CSV data
