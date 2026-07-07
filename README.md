@@ -20,6 +20,7 @@ This project implements a modular ETL (Extract, Transform, Load) pipeline for pr
 maji-ndogo-data-pipeline/
 ├── src/
 │   ├── __init__.py
+|   ├── logging_config.py           # Central logging configuration
 │   ├── config.py                   # Central configuration (paths, queries, mappings)
 │   ├── data_ingestion.py           # Low-level SQL + CSV ingestion functions
 │   ├── field_data_processor.py     # FieldDataProcessor class — cleans field survey data
@@ -27,7 +28,9 @@ maji-ndogo-data-pipeline/
 ├── notebooks/
 │   └── eda.ipynb                    # Exploratory analysis — imports the modules above
 ├── tests/
-│   └── validate_data.py             # pytest checks on the cleaned data
+|   └── __init__.py
+    |
+│   └── test_field_data_quality      # pytest checks on the cleaned field  data 
 ├── data/                             # Local only — gitignored, holds the .db file
 ├── requirements.txt
 └── README.md
@@ -56,6 +59,7 @@ from config import config_params
 from src.data_ingestion import create_db_engine, query_data, read_from_web_CSV
 from src.field_data_processor import FieldDataProcessor
 from src.weather_data_processor import WeatherDataProcessor
+from src.logging_config.py import get_logger
 
 field_processor = FieldDataProcessor(config_params)
 field_processor.process()
@@ -69,7 +73,7 @@ weather_df = weather_processor.weather_df
 ## Running tests
 
 ```bash
-pytest tests/validate_data.py -v
+pytest tests/test_field_data_quality.py -v
 ```
 
 ## Tech stack
@@ -82,4 +86,4 @@ pytest tests/validate_data.py -v
 ## Status
 
 Work in progress. Built as a portfolio project demonstrating data
-pipeline design, OOP in Python, testing, eploratory data analysis, statistical analysis and Git/GitHub workflows.
+pipeline design, OOP in Python, testing, eploratory data analysis, statistical analysis and Git/GitHub workflows
