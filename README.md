@@ -55,7 +55,7 @@ You'll also need `Maji_Ndogo_farm_survey_small.db` in the `data/` folder
 ## Usage
 
 ```python
-from config import config_params
+from src.config import config_params
 from src.data_ingestion import create_db_engine, query_data, read_from_web_CSV
 from src.field_data_processor import FieldDataProcessor
 from src.weather_data_processor import WeatherDataProcessor
