@@ -90,7 +90,7 @@ def query_data(engine, sql_query, allow_empty=False) -> pd.DataFrame:
     return df
 
 
-def read_from_web_CSV(URL) -> pd.DataFrame:
+def read_from_web_CSV(URL) -> pd.DataFrame | None:
     """
     Fetches external weather and survey datasets used in the Maji Ndogo pipeline.
     
