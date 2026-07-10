@@ -12,7 +12,7 @@ log directories if they do not exist.
 
 import os
 import logging
-def get_logger(name: str, level: str = "INFO", log_file: str = "logs/pipeline.log") -> logging:
+def get_logger(name: str, level: str = "INFO", log_file: str = "logs/pipeline.log") -> logging.Logger:
     """
     Returns a configured logger that writes to both the console and a file.
     Safe to call multiple times without duplicating handlers.
