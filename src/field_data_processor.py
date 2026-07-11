@@ -66,4 +66,6 @@ class FieldDataProcessor:
             raise ValueError("Weather mapping data failed.")
         self.df = self.df.merge(weather_map_df, on='Field_ID', how='left')
         self.df = self.df.drop(columns="Unnamed: 0")
+        self.df = self.df.rename(columns={"Weather_station": "Weather_station_ID"})
+        self.logger.info("Renamed Weather_station column to Weather_station_ID")
         return self.df
