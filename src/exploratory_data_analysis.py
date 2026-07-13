@@ -12,22 +12,18 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from src.pipeline import create_final_dataset
-from logging_config import get_logger
-
+from src.logging_config import get_logger
 
 class EDAHelper:
-    def __init__(self, df = None) -> None:
+    def __init__(self, df: pd.DataFrame | None = None) -> None:
         self.logger = get_logger(__name__)
 
-        if df is not None:
-            self.original_df = df.copy()
-        else:
-            self.original_df = None
+        self.original_df = df.copy() if df is not None else None
+        self.df = df.copy() if df is not None else None
 
-        self.df = None
         self.logger.info("EDAHelper is initialized")
     
-    def get_data(self, df) -> pd.DataFrame:
+    def get_data(self) -> pd.DataFrame:
         """
         Loads the data and creates a working copy for analysis.
         The original data remains untouched.
@@ -35,61 +31,77 @@ class EDAHelper:
         Returns:
             pd.DataFrame: A working copy of the data
         """
+        raw_data = create_final_dataset()
+        self.original_df = raw_data.copy()
+        self.df = raw_data.copy()
 
-
-
-
-
-
-    
-
-    def get_data(self) -> pd.DataFrame:
-        """
-        Loads the data for the downstream of further analysis
-        args:
-
-        """
-        self.logger.info("Loading the dataset for downstream of EDA analysis")
-        self.df = create_final_dataset()
+        self.logger.info(f"The data is successfully loaded with {len(self.df)} rows")
         return self.df
-    def quality_assesment(self, df) -> pd.DataFrame |  None:
+
+
+
+    def quality_assessment(self) -> pd.Series:
         """
         This method displays the quality assessment of the DataFrame.
         It aids in fostering the understanding of the data
         
-        Args:
-            df (pd.DataFrame): The DataFrame to assess
-        returns pd.DataFrame
+        Returns:
+                pd.Series: Count of each data type in the DataFrame
         """
     
         print("DATA QUALITY ASSESSMENT")
-        
-        missing_counts = df.isnull().sum()
+
+        if self.df is None or self.df.empty:
+            raise ValueError("The DataFrame is empty please check get_data() method ")
+        missing_counts = self.df.isnull().sum()
         missing_values = missing_counts[missing_counts > 0]
         
-        print("\n MISSING VALUES:")
+        print("\nMISSING VALUES:")
         if len(missing_values) == 0:
             print("No missing values found!")
         else:
             for col, count in missing_values.items():
-                pct = (count / len(df) * 100)
+                pct = count / len(self.df) * 100
                 print(f"  {col:20} | {count:5} missing ({pct:5.1f}%)")
         
-        duplicate_count = df.duplicated().sum()
+        duplicate_count = self.df.duplicated().sum()
         
         print("\nDUPLICATE RECORDS:")
         if duplicate_count == 0:
             print("No duplicate rows found!")
         else:
-            print(f"  Found {duplicate_count} duplicate rows ({duplicate_count/len(df)*100:.1f}%)")
+            print(f"  Found {duplicate_count} duplicate rows ({duplicate_count/len(self.df)*100:.1f}%)")
 
-        print("\n DATA TYPE COUNTS:")
-        data_type_count = df.dtypes.value_counts()
+        print("\nDATA TYPE COUNTS:")
+        data_type_count = self.df.dtypes.value_counts()
         return data_type_count
     
-    def get_categorical_columns(self, df) -> pd.DataFrame:
-        columns = df.select_dtypes(str).columns.to_list()
-        categorical_columns = pd.DataFrame(columns, columns=["categorical_columns"])
+    def get_categorical_columns(self) -> pd.DataFrame:
+        """
+        Identifies categorical columns in the DataFrame.
+    
+        Returns:
+            pd.DataFrame: DataFrame containing names of categorical columns
+        """
+
+        if self.df is None or self.df.empty:
+            raise ValueError("The DataFrame cant be empty")
+        columns = self.df.select_dtypes(include=["object", 'category']).columns.to_list()
+        categorical_columns = pd.DataFrame({"categorical_columns": columns})
         return categorical_columns
+    
+    def list_categorical_values(self, column) -> pd.DataFrame:
+        """
+        This method lists unique values of categorical variables
+        args:
+            df: the Dataframe 
+            column: the colums of the categorical variables
+        returns: 
+            pandas DataFrame: pd.DataFrame
+        """
+        if self.df is None or self.df.empty:
+            raise ValueError("The DataFrame cannnot be empty")
+        unique_values = pd.DataFrame(self.df[column].unique(), columns=[column])
+        return unique_values
 
     
