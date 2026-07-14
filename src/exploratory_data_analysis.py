@@ -39,6 +39,7 @@ class EDAHelper:
         return self.df
 
 
+
     def quality_assessment(self) -> pd.Series:
         """
         This method displays the quality assessment of the DataFrame.
