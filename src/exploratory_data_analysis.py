@@ -4,7 +4,7 @@ assess data quality, examine the distribution of variables, and identify relatio
 environmental, and weather-related factors that influence crop productivity. 
 The insights from this analysis will guide subsequent statistical analysis and predictive modeling.
 """
-
+import io
 import pandas as pd
 import numpy as np
 
