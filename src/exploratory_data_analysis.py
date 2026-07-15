@@ -21,7 +21,7 @@ class EDAHelper:
         self.original_df = df.copy() if df is not None else None
         self.df = df.copy() if df is not None else None
 
-        self.logger.info("EDAHelper is initialized")
+        self.logger.info("EDAHelper is initialized") 
     
     def get_data(self) -> pd.DataFrame:
         """
