@@ -7,18 +7,6 @@ from src.logging_config import get_logger
 class WeatherDataProcessor:
 
     def __init__(self, config_params):
-        """
-        Initialize the WeatherDataProcessor with configuration parameters.
-
-        Parameters
-        ----------
-        config_params : dict
-            Dictionary containing 'weather_csv_path' (URL to the raw weather
-            station CSV) and 'regex_patterns' (dict mapping measurement names
-            to regex patterns used to extract values from messages).
-        logging_level : str, default "INFO"
-            Logging verbosity for this instance: "DEBUG", "INFO", or "NONE".
-        """
         self.weather_csv_data = config_params["weather_csv_path"]
         self.patterns = config_params["regex_patterns"]
         self.weather_df = None
@@ -65,17 +53,6 @@ class WeatherDataProcessor:
 
         Tries each regex pattern in self.patterns in turn; the first pattern
         that matches determines the measurement type and value returned.
-
-        Parameters
-        ----------
-        message : str
-            A single raw weather station message.
-
-        Returns
-        -------
-        tuple of (str or None, float or None)
-            The matched measurement type and its value, or (None, None)
-            if no pattern matched.
         """
         for key, pattern in self.patterns.items():
             match = re.search(pattern, message)
@@ -122,16 +99,7 @@ class WeatherDataProcessor:
     def process(self):
         """
         Run the full weather data pipeline: fetch, extract, and aggregate.
-
-        Calls weather_station_mapping, process_messages, and calculate_means
-        in order, storing the final wide-format result in self.mean_df.
-
-        Returns
-        -------
-        pandas.DataFrame or None
-            The wide-format station means table.
         """
-
         self.weather_station_mapping()
         self.process_messages()
         self.mean_df = self.calculate_means()

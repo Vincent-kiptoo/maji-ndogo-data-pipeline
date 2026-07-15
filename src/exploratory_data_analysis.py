@@ -1,107 +1,191 @@
 """
-This Module explores the processed Maji Ndogo agricultural dataset to understand its structure, 
-assess data quality, examine the distribution of variables, and identify relationships between agricultural, 
-environmental, and weather-related factors that influence crop productivity. 
-The insights from this analysis will guide subsequent statistical analysis and predictive modeling.
+This module explores the processed Maji Ndogo agricultural dataset to understand
+its structure, assess data quality, examine variable distributions, and identify
+patterns that may influence crop productivity.
 """
-import io
-import pandas as pd
-import numpy as np
+
+from typing import cast
 
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
+from matplotlib.container import BarContainer
 
-from src.pipeline import create_final_dataset
 from src.logging_config import get_logger
+from src.pipeline import create_final_dataset
 
-class EDAHelper:
+
+class ExploratoryDataAnalysis:
     def __init__(self, df: pd.DataFrame | None = None) -> None:
         self.logger = get_logger(__name__)
-
         self.original_df = df.copy() if df is not None else None
         self.df = df.copy() if df is not None else None
+        self.logger.info("EDAHelper initialized")
 
-        self.logger.info("EDAHelper is initialized") 
-    
+    def _ensure_dataframe(self) -> pd.DataFrame:
+        """Return the working dataframe or raise a clear error."""
+        if self.df is None:
+            raise ValueError("No dataframe loaded. Call get_data() first.")
+        if self.df.empty:
+            raise ValueError("The dataframe is empty. Please check your data source.")
+        return self.df
+
     def get_data(self) -> pd.DataFrame:
         """
-        Loads the data and creates a working copy for analysis.
+        Load the data and create a working copy for analysis.
         The original data remains untouched.
-        
-        Returns:
-            pd.DataFrame: A working copy of the data
         """
         raw_data = create_final_dataset()
         self.original_df = raw_data.copy()
         self.df = raw_data.copy()
 
-        self.logger.info(f"The data is successfully loaded with {len(self.df)} rows")
+        self.logger.info(f"Data loaded successfully with {len(self.df)} rows")
         return self.df
-
-
 
     def quality_assessment(self) -> pd.Series:
         """
-        This method displays the quality assessment of the DataFrame.
-        It aids in fostering the understanding of the data
-        
-        Returns:
-                pd.Series: Count of each data type in the DataFrame
+        Print a simple quality assessment and return datatype counts.
         """
-    
+        df = self._ensure_dataframe()
         print("DATA QUALITY ASSESSMENT")
 
-        if self.df is None or self.df.empty:
-            raise ValueError("The DataFrame is empty please check get_data() method ")
-        missing_counts = self.df.isnull().sum()
+        missing_counts = df.isnull().sum()
         missing_values = missing_counts[missing_counts > 0]
-        
+
         print("\nMISSING VALUES:")
-        if len(missing_values) == 0:
+        if missing_values.empty:
             print("No missing values found!")
         else:
             for col, count in missing_values.items():
-                pct = count / len(self.df) * 100
+                pct = count / len(df) * 100
                 print(f"  {col:20} | {count:5} missing ({pct:5.1f}%)")
-        
-        duplicate_count = self.df.duplicated().sum()
-        
+
+        duplicate_count = df.duplicated().sum()
+
         print("\nDUPLICATE RECORDS:")
         if duplicate_count == 0:
             print("No duplicate rows found!")
         else:
-            print(f"  Found {duplicate_count} duplicate rows ({duplicate_count/len(self.df)*100:.1f}%)")
+            print(f"  Found {duplicate_count} duplicate rows ({duplicate_count / len(df) * 100:.1f}%)")
 
         print("\nDATA TYPE COUNTS:")
-        data_type_count = self.df.dtypes.value_counts()
-        return data_type_count
-    
+        return df.dtypes.value_counts()
+
     def get_categorical_columns(self) -> pd.DataFrame:
-        """
-        Identifies categorical columns in the DataFrame.
-    
-        Returns:
-            pd.DataFrame: DataFrame containing names of categorical columns
-        """
+        """Return a dataframe listing categorical columns."""
+        df = self._ensure_dataframe()
+        columns = df.select_dtypes(include=["object", "category"]).columns.tolist()
+        return pd.DataFrame({"categorical_columns": columns})
 
-        if self.df is None or self.df.empty:
-            raise ValueError("The DataFrame cant be empty")
-        columns = self.df.select_dtypes(include=["object", 'category']).columns.to_list()
-        categorical_columns = pd.DataFrame({"categorical_columns": columns})
-        return categorical_columns
-    
-    def list_categorical_values(self, column) -> pd.DataFrame:
-        """
-        This method lists unique values of categorical variables
-        args:
-            df: the Dataframe 
-            column: the colums of the categorical variables
-        returns: 
-            pandas DataFrame: pd.DataFrame
-        """
-        if self.df is None or self.df.empty:
-            raise ValueError("The DataFrame cannnot be empty")
-        unique_values = pd.DataFrame(self.df[column].unique(), columns=[column])
-        return unique_values
+    def get_categorical_column(self) -> pd.DataFrame:
+        """Backward-compatible alias for categorical column discovery."""
+        return self.get_categorical_columns()
 
-    
+    def list_categorical_values(self, column: str) -> pd.DataFrame:
+        """List the unique values found in a categorical column."""
+        df = self._ensure_dataframe()
+        if column not in df.columns:
+            raise KeyError(f"Column '{column}' was not found.")
+
+        unique_values = df[column].dropna().unique()
+        return pd.DataFrame({column: unique_values})
+
+    def get_numeric_columns(self, exclude: list[str] | None = None) -> list[str]:
+        """Return numeric columns, excluding identifiers by default."""
+        df = self._ensure_dataframe()
+        if exclude is None:
+            exclude = ["Weather_station_ID", "Field_ID"]
+
+        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        return [col for col in numeric_cols if col not in exclude]
+
+    def summary_statistics(self, numeric_cols: list[str] | None = None) -> pd.DataFrame:
+        """Return descriptive statistics for the selected numeric columns."""
+        df = self._ensure_dataframe()
+
+        if numeric_cols is None:
+            numeric_cols = self.get_numeric_columns()
+
+        missing_columns = [col for col in numeric_cols if col not in df.columns]
+        if missing_columns:
+            raise KeyError(f"Columns not found: {missing_columns}")
+
+        return df[numeric_cols].describe().T
+
+    def single_num_variable_desc_statistics(self, column: str) -> pd.DataFrame:
+        """Return descriptive statistics for one numeric variable."""
+        df = self._ensure_dataframe()
+        if column not in df.columns:
+            raise KeyError(f"Column '{column}' was not found.")
+
+        return pd.DataFrame(df[column].describe())
+
+    def plot_numerical_distribution(self, columns: str | list[str], title: str | None = None) -> None:
+        """Plot the distribution of one or more numeric columns."""
+        df = self._ensure_dataframe()
+
+        if isinstance(columns, str):
+            selected_columns = [columns]
+        else:
+            selected_columns = list(columns)
+
+        missing_columns = [col for col in selected_columns if col not in df.columns]
+        if missing_columns:
+            raise KeyError(f"Columns not found: {missing_columns}")
+
+        data = df[selected_columns]
+        if len(selected_columns) == 1:
+            values = data.iloc[:, 0]
+            mean = round(float(values.mean()), 3)
+            std = values.std()
+
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.histplot(x=values, bins=30, kde=True, ax=ax)
+            ax.axvline(mean, color="red", linewidth=2, linestyle="dashed", label=f"mean: {mean}")
+            ax.axvline(mean + std, color="orange", linewidth=2, linestyle="-", label="+1 std")
+            ax.axvline(mean - std, color="black", linewidth=2, linestyle="-", label="-1 std")
+
+            ax.set_title(title or f"Distribution of {selected_columns[0]}")
+            ax.legend()
+            plt.tight_layout()
+            plt.show()
+            return
+
+        pairplot = sns.pairplot(data, diag_kind="hist")
+        pairplot.fig.suptitle(title or "Numeric variable distributions", y=1.02)
+        plt.show()
+
+    def numerical_outlier_detection(self, column: str, title: str | None = None) -> None:
+        """Visualize outliers for a single numeric column."""
+        df = self._ensure_dataframe()
+        if column not in df.columns:
+            raise KeyError(f"Column '{column}' was not found.")
+
+        plt.figure(figsize=(8, 6))
+        sns.boxplot(x=df[column])
+        plt.title(title or f"{column} outliers", fontsize=14, fontweight="bold")
+        plt.tight_layout()
+        plt.show()
+
+    def plot_categorical_distribution(self, column: str, title: str | None = None) -> None:
+        """Plot the distribution of a categorical variable with counts and percentages."""
+        df = self._ensure_dataframe()
+        if column not in df.columns:
+            raise KeyError(f"Column '{column}' was not found.")
+
+        if title is None:
+            title = f"{column} distribution"
+
+        plt.figure(figsize=(8, 5))
+        ax = sns.countplot(data=df, y=column, order=df[column].value_counts().index)
+
+        counts = [patch.get_width() for patch in ax.containers[0]]
+        labels = [f"{int(val)} ({val / len(df) * 100:.1f}%)" for val in counts]
+        ax.bar_label(cast(BarContainer, ax.containers[0]), labels=labels, padding=5)
+
+        plt.title(title, fontsize=14, fontweight="bold")
+        plt.xlabel("Count", fontsize=12)
+        plt.ylabel(column, fontsize=12)
+        plt.tight_layout()
+        plt.show()
