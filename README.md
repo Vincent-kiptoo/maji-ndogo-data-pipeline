@@ -65,7 +65,8 @@ from src.config import config_params
 from src.data_ingestion import create_db_engine, query_data, read_from_web_CSV
 from src.field_data_processor import FieldDataProcessor
 from src.weather_data_processor import WeatherDataProcessor
-from src.logging_config.py import get_logger
+from src.logging_config import get_logger
+from src.pipepline import create_final_dataset
 
 field_processor = FieldDataProcessor(config_params)
 field_processor.process()
@@ -74,12 +75,16 @@ field_df = field_processor.df
 weather_processor = WeatherDataProcessor(config_params)
 weather_processor.process()
 weather_df = weather_processor.weather_df
+merged_df = create_final_dataset()
 ```
 
 ## Running tests
 
 ```bash
 pytest tests/test_field_data_quality.py -v
+pytest tests/test_data_ingestion.py -v
+pytest tests/test_intergration.py -v
+
 ```
 
 ## Tech stack
@@ -88,8 +93,9 @@ pytest tests/test_field_data_quality.py -v
 - **scipy** — statistical hypothesis testing
 - **pytest** — automated data validation
 - **logging** — pipeline observability
+- **Numpy** - mathematical operations
 
 ## Status
 
 Work in progress. Built as a portfolio project demonstrating data
-pipeline design, OOP in Python, testing, eploratory data analysis, statistical analysis and Git/GitHub workflows
+pipeline design, OOP in Python, testing, eploratory data analysis, statistical analysis, machine learnung and Git/GitHub workflows
