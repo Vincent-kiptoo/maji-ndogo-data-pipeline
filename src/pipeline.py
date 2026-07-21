@@ -5,6 +5,10 @@ from src.config import config_params
 
 
 def create_final_dataset():
+    """
+    This method merges both field and wether data into a single unified dataframe and
+    rename the columns to ensure consistency
+    """
 
     field_df = FieldDataProcessor(config_params).process()
 

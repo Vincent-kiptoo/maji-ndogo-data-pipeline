@@ -1,11 +1,10 @@
 """
 This is a field data processor module.
 It ingest sql data into the pandas DataFrame, 
-Swaps the columns names and merge weather csv data into the field ddataframe
+Swaps the columns names and merge weather csv data into the field dataframe
 """
 
 import pandas as pd
-import logging
 from src.data_ingestion import create_db_engine, query_data, read_from_web_CSV
 from src.logging_config import get_logger
 
@@ -69,3 +68,8 @@ class FieldDataProcessor:
         self.df = self.df.rename(columns={"Weather_station": "Weather_station_ID"})
         self.logger.info("Renamed Weather_station column to Weather_station_ID")
         return self.df
+    
+if __name__ == "__main__":
+    # Module intended to be imported; avoid executing example instantiation
+    pass
+        
