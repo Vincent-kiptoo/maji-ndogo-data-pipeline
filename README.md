@@ -11,7 +11,8 @@ This project implements a modular ETL (Extract, Transform, Load) pipeline for pr
 3. **Validates** the cleaned data with automated tests (`pytest`) and a
    statistical hypothesis test comparing field-reported weather to
    independent weather station readings.
-4. **Exposes** the result as ready-to-analyse pandas DataFrames for
+   **Merges** both field data and wether data into a single unified DataFrame
+5. **Exposes** the result as ready-to-analyse pandas DataFrames for
    exploratory data analysis (EDA).
 
 ## Project structure
@@ -20,17 +21,22 @@ This project implements a modular ETL (Extract, Transform, Load) pipeline for pr
 maji-ndogo-data-pipeline/
 ├── src/
 │   ├── __init__.py
-|   ├── logging_config.py           # Central logging configuration
-│   ├── config.py                   # Central configuration (paths, queries, mappings)
-│   ├── data_ingestion.py           # Low-level SQL + CSV ingestion functions
-│   ├── field_data_processor.py     # FieldDataProcessor class — cleans field survey data
-│   └── weather_data_processor.py   # WeatherDataProcessor class — cleans weather station data
+|   ├── logging_config.py              # Central logging configuration
+│   ├── config.py                      # Central configuration (paths, queries, mappings)
+│   ├── data_ingestion.py              # Low-level SQL + CSV ingestion functions
+|   ├── exploratory_data_analysis.py   # performs exploratory data analysis 
+│   ├── field_data_processor.py        # FieldDataProcessor class — cleans field survey data
+│   ├── weather_data_processor.py      # WeatherDataProcessor class — cleans weather station data
+|   └──  pipepline.py                  # Merges field and weather datasets into a single DataFrame  
 ├── notebooks/
-│   └── eda.ipynb                    # Exploratory analysis — imports the modules above
+│   ├──  01_data_overview.ipynb            # Exploratory analysis — imports the modules above
+|   └── 02_statistical_analysis.ipynb      # Perform statistical analysis including hypothesis test etc
 ├── tests/
 |   └── __init__.py
     |
-│   └── test_field_data_quality      # pytest checks on the cleaned field  data 
+│   └── test_field_data_quality      # pytest checks on the cleaned field  data
+|   └──  test_data_ingestion.py
+|   └──  test_intergration.py
 ├── data/                             # Local only — gitignored, holds the .db file
 ├── requirements.txt
 └── README.md
