@@ -72,15 +72,11 @@ class ExploratoryDataAnalysis:
         print("\nDATA TYPE COUNTS:")
         return df.dtypes.value_counts()
 
-    def get_categorical_columns(self) -> pd.DataFrame:
+    def get_categorical_columns(self) -> list:
         """Return a dataframe listing categorical columns."""
         df = self._ensure_dataframe()
         columns = df.select_dtypes(include=["object", "category"]).columns.tolist()
-        return pd.DataFrame({"categorical_columns": columns})
-
-    def get_categorical_column(self) -> pd.DataFrame:
-        """Backward-compatible alias for categorical column discovery."""
-        return self.get_categorical_columns()
+        return columns
 
     def list_categorical_values(self, column: str) -> pd.DataFrame:
         """List the unique values found in a categorical column."""
@@ -113,47 +109,37 @@ class ExploratoryDataAnalysis:
 
         return df[numeric_cols].describe().T
 
-    def single_num_variable_desc_statistics(self, column: str) -> pd.DataFrame:
+    def single_num_variable_desc_statistics(self, column: str) -> pd.Series:
         """Return descriptive statistics for one numeric variable."""
         df = self._ensure_dataframe()
         if column not in df.columns:
             raise KeyError(f"Column '{column}' was not found.")
 
-        return pd.DataFrame(df[column].describe())
+        return df[column].describe()
 
-    def plot_numerical_distribution(self, columns: str | list[str], title: str | None = None) -> None:
-        """Plot the distribution of one or more numeric columns."""
+    def plot_numerical_distribution(self, column, title=None) -> None:
+        """
+        A Plot for the distribution of a numerical variable with counts.
+        """
         df = self._ensure_dataframe()
 
-        if isinstance(columns, str):
-            selected_columns = [columns]
-        else:
-            selected_columns = list(columns)
+        if not isinstance(column, str):
+            raise ValueError(f"Expected string column name, got {type(column)}")
+        
+        mean = round(float(df[column].mean()), 3)
+        std = df[column].std()
 
-        missing_columns = [col for col in selected_columns if col not in df.columns]
-        if missing_columns:
-            raise KeyError(f"Columns not found: {missing_columns}")
+        fig, ax = plt.subplots(figsize=(8, 6))
+        sns.histplot(data=df, x=column, bins=30, kde=True, ax=ax) 
+        
+        ax.axvline(mean, color="red", linewidth=2, linestyle="dashed", label=f"Mean: {mean}")
+        ax.axvline(mean + std, color="orange", linewidth=2, linestyle="-", label=f"+1 Std")
+        ax.axvline(mean - std, color="black", linewidth=2, linestyle="-", label=f"-1 Std")
 
-        data = df[selected_columns]
-        if len(selected_columns) == 1:
-            values = data.iloc[:, 0]
-            mean = round(float(values.mean()), 3)
-            std = values.std()
-
-            fig, ax = plt.subplots(figsize=(8, 6))
-            sns.histplot(x=values, bins=30, kde=True, ax=ax)
-            ax.axvline(mean, color="red", linewidth=2, linestyle="dashed", label=f"mean: {mean}")
-            ax.axvline(mean + std, color="orange", linewidth=2, linestyle="-", label="+1 std")
-            ax.axvline(mean - std, color="black", linewidth=2, linestyle="-", label="-1 std")
-
-            ax.set_title(title or f"Distribution of {selected_columns[0]}")
-            ax.legend()
-            plt.tight_layout()
-            plt.show()
-            return
-
-        pairplot = sns.pairplot(data, diag_kind="hist")
-        pairplot.fig.suptitle(title or "Numeric variable distributions", y=1.02)
+        plot_title = title if title else f"Distribution of {column}"
+        ax.set_title(plot_title)
+        ax.legend()
+        plt.tight_layout()
         plt.show()
 
     def numerical_outlier_detection(self, column: str, title: str | None = None) -> None:
