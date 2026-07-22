@@ -11,7 +11,8 @@ This project implements a modular ETL (Extract, Transform, Load) pipeline for pr
 3. **Validates** the cleaned data with automated tests (`pytest`) and a
    statistical hypothesis test comparing field-reported weather to
    independent weather station readings.
-4. **Exposes** the result as ready-to-analyse pandas DataFrames for
+   **Merges** both field data and wether data into a single unified DataFrame
+5. **Exposes** the result as ready-to-analyse pandas DataFrames for
    exploratory data analysis (EDA).
 
 ## Project structure
@@ -20,17 +21,22 @@ This project implements a modular ETL (Extract, Transform, Load) pipeline for pr
 maji-ndogo-data-pipeline/
 ├── src/
 │   ├── __init__.py
-|   ├── logging_config.py           # Central logging configuration
-│   ├── config.py                   # Central configuration (paths, queries, mappings)
-│   ├── data_ingestion.py           # Low-level SQL + CSV ingestion functions
-│   ├── field_data_processor.py     # FieldDataProcessor class — cleans field survey data
-│   └── weather_data_processor.py   # WeatherDataProcessor class — cleans weather station data
+|   ├── logging_config.py              # Central logging configuration
+│   ├── config.py                      # Central configuration (paths, queries, mappings)
+│   ├── data_ingestion.py              # Low-level SQL + CSV ingestion functions
+|   ├── exploratory_data_analysis.py   # performs exploratory data analysis 
+│   ├── field_data_processor.py        # FieldDataProcessor class — cleans field survey data
+│   ├── weather_data_processor.py      # WeatherDataProcessor class — cleans weather station data
+|   └──  pipepline.py                  # Merges field and weather datasets into a single DataFrame  
 ├── notebooks/
-│   └── eda.ipynb                    # Exploratory analysis — imports the modules above
+│   ├──  01_data_overview.ipynb            # Exploratory analysis — imports the modules above
+|   └── 02_statistical_analysis.ipynb      # Perform statistical analysis including hypothesis test etc
 ├── tests/
 |   └── __init__.py
     |
-│   └── test_field_data_quality      # pytest checks on the cleaned field  data 
+│   └── test_field_data_quality      # pytest checks on the cleaned field  data
+|   └──  test_data_ingestion.py
+|   └──  test_intergration.py
 ├── data/                             # Local only — gitignored, holds the .db file
 ├── requirements.txt
 └── README.md
@@ -59,7 +65,8 @@ from src.config import config_params
 from src.data_ingestion import create_db_engine, query_data, read_from_web_CSV
 from src.field_data_processor import FieldDataProcessor
 from src.weather_data_processor import WeatherDataProcessor
-from src.logging_config.py import get_logger
+from src.logging_config import get_logger
+from src.pipepline import create_final_dataset
 
 field_processor = FieldDataProcessor(config_params)
 field_processor.process()
@@ -68,12 +75,16 @@ field_df = field_processor.df
 weather_processor = WeatherDataProcessor(config_params)
 weather_processor.process()
 weather_df = weather_processor.weather_df
+merged_df = create_final_dataset()
 ```
 
 ## Running tests
 
 ```bash
 pytest tests/test_field_data_quality.py -v
+pytest tests/test_data_ingestion.py -v
+pytest tests/test_intergration.py -v
+
 ```
 
 ## Tech stack
@@ -82,8 +93,9 @@ pytest tests/test_field_data_quality.py -v
 - **scipy** — statistical hypothesis testing
 - **pytest** — automated data validation
 - **logging** — pipeline observability
+- **Numpy** - mathematical operations
 
 ## Status
 
 Work in progress. Built as a portfolio project demonstrating data
-pipeline design, OOP in Python, testing, eploratory data analysis, statistical analysis and Git/GitHub workflows
+pipeline design, OOP in Python, testing, eploratory data analysis, statistical analysis, machine learnung and Git/GitHub workflows
